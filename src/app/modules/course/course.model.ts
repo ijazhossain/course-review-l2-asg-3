@@ -31,6 +31,7 @@ const courseSchema = new Schema<TCourse>({
   title: {
     type: String,
     unique: true,
+    trim: true,
     required: [true, 'Course title is required'],
   },
   instructor: {
