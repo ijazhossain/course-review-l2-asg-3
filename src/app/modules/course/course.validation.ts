@@ -22,14 +22,12 @@ const updateDetailsValidationSchema = z.object({
   description: z.string().optional(),
 });
 const createCourseValidationSchema = z.object({
-  body: z.object({
-    title: z
-      .string({
-        required_error: 'Course title is required',
-        invalid_type_error: 'Course title must be a string',
-      })
-      .max(30),
-  }),
+  title: z
+    .string({
+      required_error: 'Course title is required',
+      invalid_type_error: 'Course title must be a string',
+    })
+    .max(30),
   instructor: z
     .string({
       required_error: 'Course instructor is required',
@@ -42,8 +40,8 @@ const createCourseValidationSchema = z.object({
   }),
   price: z
     .number({
-      required_error: 'Course categoryId is required',
-      invalid_type_error: 'Course categoryId must be a number',
+      required_error: 'Course price is required',
+      invalid_type_error: 'Course price must be a number',
     })
     .positive(),
   tags: z.array(createTagsValidationSchema),
@@ -63,12 +61,12 @@ const createCourseValidationSchema = z.object({
     required_error: 'Course provider is required',
     invalid_type_error: 'Course provider must be a string',
   }),
-  durationInWeeks: z
-    .number({
-      invalid_type_error: 'Course provider must be a number',
-    })
-    .positive()
-    .optional(),
+  // durationInWeeks: z
+  //   .number({
+  //     invalid_type_error: 'Course provider must be a number',
+  //   })
+  //   .positive()
+  //   .optional(),
   details: createDetailsValidationSchema,
 });
 const updateCourseValidationSchema = z.object({
@@ -83,10 +81,10 @@ const updateCourseValidationSchema = z.object({
   endDate: z.string().optional(),
   language: z.string().optional(),
   provider: z.string().optional(),
-  durationInWeeks: z.number().positive().optional().optional(),
+  // durationInWeeks: z.number().positive().optional(),
   details: updateDetailsValidationSchema,
 });
-export const courseValidations = {
+export const CourseValidations = {
   createCourseValidationSchema,
   updateCourseValidationSchema,
 };

@@ -68,9 +68,9 @@ const courseSchema = new Schema<TCourse>({
     type: String,
     required: [true, 'Provider is required'],
   },
-  durationInWeeks: {
-    type: Number,
-  },
+  // durationInWeeks: {
+  //   type: Number,
+  // },
   details: {
     type: detailsSchema,
     required: [true, 'Course details is required'],
