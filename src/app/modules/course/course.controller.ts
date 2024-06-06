@@ -11,7 +11,16 @@ const createCourse = catchAsync(async (req, res) => {
     data: result,
   });
 });
+const getAllCourses = catchAsync(async (req, res) => {
+  const result = await CourseServices.getAllCoursesFromDB();
+  res.status(200).json({
+    success: false,
+    message: 'All courses are retrieved successfully',
+    data: result,
+  });
+});
 
 export const CourseControllers = {
   createCourse,
+  getAllCourses,
 };
