@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import { CourseServices } from './course.service';
-import catchAsync from '../../../middlewares/globalErrorHandler';
+import catchAsync from '../../../middlewares/catchAsync';
 
 const createCourse = catchAsync(async (req, res) => {
   const result = await CourseServices.createCourseIntoDB(req.body);
@@ -12,7 +12,7 @@ const createCourse = catchAsync(async (req, res) => {
   });
 });
 const getAllCourses = catchAsync(async (req, res) => {
-  const result = await CourseServices.getAllCoursesFromDB();
+  const result = await CourseServices.getAllCoursesFromDB(req.query);
   res.status(200).json({
     success: false,
     message: 'All courses are retrieved successfully',
