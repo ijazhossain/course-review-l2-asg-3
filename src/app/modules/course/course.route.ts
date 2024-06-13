@@ -5,10 +5,10 @@ import { CourseValidations } from './course.validation';
 
 const router = Router();
 router.post(
-  '/api/course',
+  '/course',
   validateRequest(CourseValidations.createCourseValidationSchema),
   CourseControllers.createCourse,
 );
-router.get('/api/courses', CourseControllers.getAllCourses);
-router.get('/api/courses/:courseId', CourseControllers.getSingleCourse);
+router.get('/courses', CourseControllers.getAllCourses);
+router.get('/courses/:courseId', CourseControllers.getSingleCourse);
 export const CourseRoutes = router;
