@@ -10,4 +10,5 @@ router.post(
   CourseControllers.createCourse,
 );
 router.get('/api/courses', CourseControllers.getAllCourses);
+router.get('/api/courses/:courseId', CourseControllers.getSingleCourse);
 export const CourseRoutes = router;

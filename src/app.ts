@@ -4,6 +4,7 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import { CourseRoutes } from './app/modules/course/course.route';
+import globalErrorHandler from './middlewares/globalErrorHandler';
 const app: Application = express();
 // parser
 app.use(express.json());
@@ -16,13 +17,5 @@ app.get('/', (req: Request, res: Response) => {
   });
 });
 // global error handler
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  const statusCode = 500;
-  const message = err.message || 'Something went wrong';
-  return res.status(statusCode).json({
-    success: false,
-    message,
-    error: err,
-  });
-});
+app.use(globalErrorHandler);
 export default app;

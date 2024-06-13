@@ -63,8 +63,12 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
   const limitQuery = await paginateQuery.limit(limit);
   return limitQuery;
 };
-
+const getSingleCourseFromDB = async (id: string) => {
+  const result = await Course.findById(id);
+  return result;
+};
 export const CourseServices = {
   createCourseIntoDB,
   getAllCoursesFromDB,
+  getSingleCourseFromDB,
 };

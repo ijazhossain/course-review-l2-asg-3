@@ -68,12 +68,23 @@ const courseSchema = new Schema<TCourse>({
     type: String,
     required: [true, 'Provider is required'],
   },
-  // durationInWeeks: {
-  //   type: Number,
-  // },
+  durationInWeeks: {
+    type: Number,
+    min: [1, 'Course duration must be positive.'],
+  },
   details: {
     type: detailsSchema,
     required: [true, 'Course details is required'],
   },
+});
+courseSchema.pre('save', function (next) {
+  const oneDay = 24 * 60 * 60 * 1000;
+  const parsedStartDate = new Date(this.startDate);
+  const parsedEndDate = new Date(this.endDate);
+  const timeDifference = parsedEndDate.getTime() - parsedStartDate.getTime();
+  const daysDifference = timeDifference / oneDay;
+  const durationInWeeks = Math.ceil(daysDifference / 7);
+  this.durationInWeeks = durationInWeeks;
+  next();
 });
 export const Course = model<TCourse>('Course', courseSchema);

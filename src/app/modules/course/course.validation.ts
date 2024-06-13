@@ -38,12 +38,12 @@ const createCourseValidationSchema = z.object({
     required_error: 'Course categoryId is required',
     invalid_type_error: 'Course categoryId must be a string',
   }),
-  price: z
+  /*  price: z
     .number({
       required_error: 'Course price is required',
       invalid_type_error: 'Course price must be a number',
     })
-    .positive(),
+    .positive(), */
   tags: z.array(createTagsValidationSchema),
   startDate: z.string({
     required_error: 'startDate is required',
@@ -61,12 +61,12 @@ const createCourseValidationSchema = z.object({
     required_error: 'Course provider is required',
     invalid_type_error: 'Course provider must be a string',
   }),
-  // durationInWeeks: z
-  //   .number({
-  //     invalid_type_error: 'Course provider must be a number',
-  //   })
-  //   .positive()
-  //   .optional(),
+  durationInWeeks: z
+    .number({
+      invalid_type_error: 'Course provider must be a number',
+    })
+    .positive()
+    .optional(),
   details: createDetailsValidationSchema,
 });
 const updateCourseValidationSchema = z.object({
@@ -81,7 +81,7 @@ const updateCourseValidationSchema = z.object({
   endDate: z.string().optional(),
   language: z.string().optional(),
   provider: z.string().optional(),
-  // durationInWeeks: z.number().positive().optional(),
+  durationInWeeks: z.number().positive().optional(),
   details: updateDetailsValidationSchema,
 });
 export const CourseValidations = {
