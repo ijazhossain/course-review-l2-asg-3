@@ -3,6 +3,7 @@ import AppError from '../../errors/AppError';
 import { TCourse } from './course.interface';
 import { Course } from './course.model';
 import mongoose from 'mongoose';
+import { Review } from '../reviews/reviews.model';
 
 const createCourseIntoDB = async (payload: TCourse) => {
   const result = await Course.create(payload);
@@ -66,9 +67,13 @@ const getAllCoursesFromDB = async (query: Record<string, unknown>) => {
   const limitQuery = await paginateQuery.limit(limit);
   return limitQuery;
 };
-const getSingleCourseFromDB = async (id: string) => {
-  const result = await Course.findById(id);
-  return result;
+const getSingleCourseWithReviewsFromDB = async (id: string) => {
+  const course = await Course.findById(id);
+  const reviews = await Review.find({ courseId: id });
+  return {
+    course,
+    reviews,
+  };
 };
 const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
   const {
@@ -99,7 +104,7 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
       throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
     }
     // update course start, end date and durations
-    // update course duration, start and end Date
+
     if (!startDate && !endDate && durationInWeeks) {
       throw new AppError(
         httpStatus.BAD_REQUEST,
@@ -124,7 +129,6 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
         parsedEndDate.getTime() - parsedStartDate.getTime();
       const daysDifference = timeDifference / oneDay;
       const duration = Math.ceil(daysDifference / 7);
-      console.log({ duration });
       const updateDuration = await Course.findByIdAndUpdate(
         id,
         {
@@ -208,9 +212,10 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!!!');
   }
 };
+
 export const CourseServices = {
   createCourseIntoDB,
   getAllCoursesFromDB,
-  getSingleCourseFromDB,
+  getSingleCourseWithReviewsFromDB,
   updateCourseIntoDB,
 };

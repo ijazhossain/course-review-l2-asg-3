@@ -10,6 +10,13 @@ router.post(
   CourseControllers.createCourse,
 );
 router.get('/courses', CourseControllers.getAllCourses);
-router.get('/courses/:courseId', CourseControllers.getSingleCourse);
-router.put('/courses/:courseId', CourseControllers.updateCourse);
+router.get(
+  '/courses/:courseId/reviews',
+  CourseControllers.getSingleCourseWithReviews,
+);
+router.put(
+  '/courses/:courseId',
+  validateRequest(CourseValidations.updateCourseValidationSchema),
+  CourseControllers.updateCourse,
+);
 export const CourseRoutes = router;
