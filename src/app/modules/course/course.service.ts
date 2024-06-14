@@ -1,5 +1,8 @@
+import httpStatus from 'http-status';
+import AppError from '../../errors/AppError';
 import { TCourse } from './course.interface';
 import { Course } from './course.model';
+import mongoose from 'mongoose';
 
 const createCourseIntoDB = async (payload: TCourse) => {
   const result = await Course.create(payload);
@@ -67,8 +70,147 @@ const getSingleCourseFromDB = async (id: string) => {
   const result = await Course.findById(id);
   return result;
 };
+const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
+  const {
+    tags,
+    startDate,
+    endDate,
+    durationInWeeks,
+    details,
+    ...remainingCourseData
+  } = payload;
+  const session = await mongoose.startSession();
+
+  try {
+    session.startTransaction();
+    const modifiedData: Record<string, unknown> = { ...remainingCourseData };
+    const updateBasicInfo = await Course.findByIdAndUpdate(
+      id,
+      {
+        $set: modifiedData,
+      },
+      {
+        new: true,
+        runValidators: true,
+        session,
+      },
+    );
+    if (!updateBasicInfo) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+    }
+    // update course start, end date and durations
+    // update course duration, start and end Date
+    if (!startDate && !endDate && durationInWeeks) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        'Do not update Course duration directly, update start or end date instead',
+      );
+    }
+
+    if (
+      (startDate && startDate.length > 0) ||
+      (endDate && endDate.length > 0)
+    ) {
+      const previousCourseData = (await Course.findById(id)) as TCourse;
+
+      const oneDay = 24 * 60 * 60 * 1000;
+      const parsedStartDate = new Date(
+        startDate ? startDate : previousCourseData?.startDate,
+      );
+      const parsedEndDate = new Date(
+        endDate ? endDate : previousCourseData?.endDate,
+      );
+      const timeDifference =
+        parsedEndDate.getTime() - parsedStartDate.getTime();
+      const daysDifference = timeDifference / oneDay;
+      const duration = Math.ceil(daysDifference / 7);
+      console.log({ duration });
+      const updateDuration = await Course.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            durationInWeeks: duration,
+            startDate: startDate ? startDate : previousCourseData?.startDate,
+            endDate: endDate ? endDate : previousCourseData?.endDate,
+          },
+        },
+        {
+          new: true,
+          runValidators: true,
+          session,
+        },
+      );
+      if (!updateDuration) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+      }
+    }
+    // update tags fields
+    if (tags && tags.length > 0) {
+      const deletedTags = tags
+        .filter((tag) => tag.name && tag.isDeleted)
+        .map((tag) => tag.name);
+      const updateDeletedTagsInCourse = await Course.findByIdAndUpdate(
+        id,
+        {
+          $pull: { tags: { name: { $in: deletedTags } } },
+        },
+        {
+          new: true,
+          runValidators: true,
+          session,
+        },
+      );
+      if (!updateDeletedTagsInCourse) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+      }
+      const newTags = tags?.filter((tag) => tag.name && !tag.isDeleted);
+      const updateNewTagsInCourse = await Course.findByIdAndUpdate(
+        id,
+        {
+          $addToSet: { tags: { $each: newTags } },
+        },
+        {
+          new: true,
+          runValidators: true,
+          session,
+        },
+      );
+      if (!updateNewTagsInCourse) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+      }
+    }
+    // update the details field
+    if (details && Object.keys(details).length) {
+      for (const [key, value] of Object.entries(details)) {
+        modifiedData[`details.${key}`] = value;
+      }
+    }
+    const updateDetailsInCourse = await Course.findByIdAndUpdate(
+      id,
+      { $set: modifiedData },
+      {
+        new: true,
+        upsert: true,
+        runValidators: true,
+        session,
+      },
+    );
+    if (!updateDetailsInCourse) {
+      throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course');
+    }
+    await session.commitTransaction();
+    await session.endSession();
+    const result = await Course.findById(id);
+    return result;
+  } catch (error) {
+    await session.abortTransaction();
+    await session.endSession();
+    throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!!!');
+  }
+};
 export const CourseServices = {
   createCourseIntoDB,
   getAllCoursesFromDB,
   getSingleCourseFromDB,
+  updateCourseIntoDB,
 };

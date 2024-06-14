@@ -4,8 +4,8 @@
 import express, { Application, NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import { CourseRoutes } from './app/modules/course/course.route';
-import globalErrorHandler from './middlewares/globalErrorHandler';
-import notFound from './middlewares/notFound';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
 import { CategoriesRoutes } from './app/modules/category/category.route';
 import { ReviewsRoutes } from './app/modules/reviews/reviews.route';
 import router from './app/routes';
