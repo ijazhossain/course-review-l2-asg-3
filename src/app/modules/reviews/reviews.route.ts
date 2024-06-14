@@ -5,7 +5,7 @@ import { ReviewValidations } from './reviews.validation';
 
 const router = Router();
 router.post(
-  '/reviews',
+  '/',
   validateRequest(ReviewValidations.createReviewValidationSchema),
   ReviewsControllers.createReviews,
 );

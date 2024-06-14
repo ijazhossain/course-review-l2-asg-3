@@ -8,14 +8,16 @@ import globalErrorHandler from './middlewares/globalErrorHandler';
 import notFound from './middlewares/notFound';
 import { CategoriesRoutes } from './app/modules/category/category.route';
 import { ReviewsRoutes } from './app/modules/reviews/reviews.route';
+import router from './app/routes';
 const app: Application = express();
 // parser
 app.use(express.json());
 app.use(cors());
+// course route
 app.use('/api', CourseRoutes);
-app.use('/api', CategoriesRoutes);
-app.use('/api', ReviewsRoutes);
-app.get('/api', (req: Request, res: Response) => {
+// app route
+app.use('/api', router);
+app.get('/', (req: Request, res: Response) => {
   res.status(200).json({
     success: true,
     message: 'Express server is running!',

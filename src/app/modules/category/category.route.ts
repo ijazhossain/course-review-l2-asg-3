@@ -5,7 +5,7 @@ import createCategoryValidationSchema from './category.validation';
 
 const router = Router();
 router.post(
-  '/categories',
+  '/',
   validateRequest(createCategoryValidationSchema),
   CategoryControllers.createCategory,
 );
