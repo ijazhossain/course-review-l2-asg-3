@@ -212,10 +212,70 @@ const updateCourseIntoDB = async (id: string, payload: Partial<TCourse>) => {
     throw new AppError(httpStatus.BAD_REQUEST, 'Failed to update course!!!');
   }
 };
+// service to get the best course
+const getBestCourseFromDB = async () => {
+  const result = await Review.aggregate([
+    {
+      $group: {
+        _id: '$courseId',
+        averageRating: { $avg: '$rating' },
+        reviewCount: { $sum: 1 },
+      },
+    },
+    {
+      $addFields: {
+        averageRating: { $round: ['$averageRating', 2] },
+      },
+    },
+    {
+      $lookup: {
+        from: 'courses',
+        localField: '_id',
+        foreignField: '_id',
+        as: 'course',
+      },
+    },
+    {
+      $unwind: '$course',
+    },
+    {
+      $sort: { averageRating: -1 },
+    },
+    {
+      $limit: 1,
+    },
+    {
+      $project: {
+        'course._id': 1,
+        'course.title': 1,
+        'course.instructor': 1,
+        'course.categoryId': 1,
+        'course.price': 1,
+        'course.tags': 1,
+        'course.startDate': 1,
+        'course.endDate': 1,
+        'course.language': 1,
+        'course.provider': 1,
+        'course.durationInWeeks': 1,
+        'course.details': 1,
+        averageRating: 1,
+        reviewCount: 1,
+      },
+    },
+  ]);
 
+  if (result.length === 0) {
+    throw new AppError(httpStatus.BAD_REQUEST, 'No courses found with reviews');
+  }
+
+  const bestCourse = result[0];
+
+  return bestCourse;
+};
 export const CourseServices = {
   createCourseIntoDB,
   getAllCoursesFromDB,
   getSingleCourseWithReviewsFromDB,
   updateCourseIntoDB,
+  getBestCourseFromDB,
 };

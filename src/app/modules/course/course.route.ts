@@ -19,4 +19,5 @@ router.put(
   validateRequest(CourseValidations.updateCourseValidationSchema),
   CourseControllers.updateCourse,
 );
+router.get('/course/best', CourseControllers.getBestCourse);
 export const CourseRoutes = router;
